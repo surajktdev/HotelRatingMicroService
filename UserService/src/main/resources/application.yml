@@ -1,0 +1,55 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: USER-SERVICE
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/microservices
+    username: root
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  resilience4j:
+    circuitbreaker:
+      instances:
+        hotelRatingBreaker:
+          registerHealthIndicator: true
+          eventConsumerBufferSize: 10
+          failureRateThreshold: 50
+          automaticTransitionFromOpenToHalfOpenEnabled: true
+          waitDurationInOpenState: 6s
+          permittedNumberOfCallsInHalfOpenState: 2
+          slidingWindowSize: 5
+          slidingWindowType: COUNT_BASED
+
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+
+  endpoint:
+    health:
+      show-details: ALWAYS
+
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    jersey:
+      enabled: false
